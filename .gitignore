@@ -33,5 +33,5 @@ env/
 *.swo
 
 # Project specific
-backend/data/arxiv/
+backend/data/ogbn_arxiv/
 *.log 
