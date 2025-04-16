@@ -10,6 +10,66 @@ The goal of this project is to build a system that predicts future citations bet
 
 This is a solo weekend project, so the focus is on creating a functional Minimum Viable Product (MVP) that can be easily demonstrated to others. The system does not need to scale to many users, and data will be stored in memory to avoid the complexity of maintaining a database.
 
+### Current Progress
+
+#### ✅ Completed Components:
+1. **Project Setup**
+   - Directory structure created
+   - Virtual environment set up
+   - Dependencies installed and documented
+
+2. **Data Handling**
+   - ArxivDataset class implemented
+   - Dataset loading and processing
+   - Basic data statistics and access methods
+   - Test file for data loading
+
+3. **Model Development**
+   - GAT model implementation
+   - Attention weight tracking
+   - Link prediction functionality
+   - Test file for model functionality
+
+4. **Backend API**
+   - FastAPI application setup
+   - Two endpoints implemented:
+     - `/predict_link` (POST): Predicts citation probability between papers
+     - `/graph` (GET): Returns graph subset for visualization
+   - Error handling and input validation
+   - Basic API test suite
+
+#### 🚧 In Progress:
+1. **Model Training**
+   - Model architecture implemented
+   - Training code needs to be written
+   - Model weights need to be saved/loaded
+
+2. **Frontend Development**
+   - Not started yet
+   - Will use Next.js with graph visualization
+
+#### 📝 TODO:
+1. **Model Training**
+   - Implement training loop
+   - Add evaluation metrics
+   - Save/load model weights
+
+2. **Frontend Development**
+   - Set up Next.js project
+   - Implement graph visualization
+   - Create prediction form
+   - Add attention weight visualization
+
+3. **Integration**
+   - Connect frontend to backend
+   - Test full system flow
+   - Add error handling
+
+4. **Testing**
+   - Enhance API test suite
+   - Add model validation tests
+   - Add frontend tests
+
 ### Tech Stack
 
 - **Backend**:
@@ -66,19 +126,22 @@ The project employs a GNN for link prediction:
 ### API Endpoints
 
 The backend provides the following key API endpoints:
-- **`GET /predict_link`**:
+- **`POST /predict_link`**:
   - **Input**: JSON with two node indices, e.g., `{"node1": 0, "node2": 1}`
-  - **Output**: Predicted citation probability and attention weights, e.g., `{"probability": 0.75, "attention": 0.8}`
-- **`GET /graph`** (Optional for MVP):
+  - **Output**: Predicted citation probability and attention weights, e.g., `{"probability": 0.75, "attention": {"layer1": 0.8, "layer2": 0.7}}`
+- **`GET /graph`**:
   - **Output**: A subset of the citation graph (nodes and edges) for visualization
+  - Returns first 100 nodes and all their connections
+  - Includes node features and edge information
 
 **Implementation**:
 - The API is built using FastAPI, with the GNN model and dataset loaded into memory on startup.
-- For the MVP, only the `/predict_link` endpoint is essential.
+- Error handling for invalid inputs and server errors.
+- Basic test suite for API functionality.
 
-### Frontend Components
+### Frontend Components (Not Started)
 
-The frontend consists of two main components:
+The frontend will consist of two main components:
 1. **Static Graph Visualization**:
    - Displays a fixed subset of the citation graph (e.g., 100 nodes and their edges).
    - Uses Cytoscape.js or Sigma.js for rendering.
@@ -89,39 +152,28 @@ The frontend consists of two main components:
    - Shows attention weights for interpretability.
 
 **Interaction**:
-- The graph is static for the MVP, with optional interactivity (e.g., clicking nodes to view details) if time allows.
-- The form uses API calls to fetch and display predictions.
-
-### Integration
-
-- **Data Flow**:
-  - The frontend sends requests to the backend API to get prediction results.
-  - For the MVP, the graph data can be hardcoded or fetched via an optional `/graph` endpoint.
-- **API Calls**:
-  - Use `fetch` or `axios` in the frontend to interact with the backend.
-- **Testing**:
-  - Ensure that the frontend correctly displays the graph and prediction results.
-  - Verify that the API returns accurate predictions for given node pairs.
+- The graph will be static for the MVP, with optional interactivity (e.g., clicking nodes to view details) if time allows.
+- The form will use API calls to fetch and display predictions.
 
 ### Development Phases
 
 The project is divided into the following phases:
-1. **Project Setup** (1 hour):
+1. ✅ **Project Setup** (1 hour):
    - Create directory structure, set up virtual environment, install initial dependencies.
-2. **Data Handling** (2 hours):
+2. ✅ **Data Handling** (2 hours):
    - Load and split the `ogbn-arxiv` dataset using PyTorch Geometric.
-3. **Model Development** (4-5 hours):
+3. ✅ **Model Development** (4-5 hours):
    - Implement and train a GAT model for link prediction.
    - Add attention weight tracking.
-4. **Backend API** (2-3 hours):
+4. ✅ **Backend API** (2-3 hours):
    - Create the `/predict_link` endpoint in FastAPI.
    - Add attention weight handling.
-5. **Frontend Visualization** (3-4 hours):
+5. 🚧 **Frontend Visualization** (3-4 hours):
    - Build the Next.js app with graph visualization and prediction form.
    - Add attention weight visualization.
-6. **Integration and Testing** (2-3 hours):
+6. 🚧 **Integration and Testing** (2-3 hours):
    - Connect the frontend to the backend and test the full flow.
-7. **Optional Enhancements** (if time permits):
+7. 📝 **Optional Enhancements** (if time permits):
    - Add interactivity to the graph, display paper titles, or improve UI/UX.
 
 **Total Estimated Time**: 14-17 hours

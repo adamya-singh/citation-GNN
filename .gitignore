@@ -35,3 +35,34 @@ env/
 # Project specific
 backend/data/ogbn_arxiv/
 *.log 
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+frontend/coverage/
+frontend/.cache/
+frontend/.DS_Store
+frontend/.vscode/*
+!frontend/.vscode/extensions.json
+frontend/.idea
+frontend/*.suo
+frontend/*.ntvs*
+frontend/*.njsproj
+frontend/*.sln
+frontend/*.sw?
+
+# Vite
+frontend/.vite/
+frontend/*.tsbuildinfo
+
+# TypeScript
+frontend/*.tsbuildinfo
+frontend/tsconfig.tsbuildinfo 

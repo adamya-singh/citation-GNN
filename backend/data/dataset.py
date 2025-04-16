@@ -31,17 +31,23 @@ class ArxivDataset:
         """
         Load the OGBN-Arxiv dataset and prepare it for link prediction.
         """
+        print("Starting dataset loading...")
         # Load the dataset
         self.dataset = PygNodePropPredDataset(name='ogbn-arxiv', root=self.root)
+        print("Dataset object created")
         
         # Get the graph data
         self.graph = self.dataset[0]
+        print(f"Graph loaded with {self.graph.num_nodes} nodes and {self.graph.edge_index.shape[1]} edges")
+        print(f"Edge index shape: {self.graph.edge_index.shape}")
+        print(f"Edge index sample: {self.graph.edge_index[:, :5]}")
         
         # Get the split masks
         split_idx = self.dataset.get_idx_split()
         self.train_mask = split_idx['train']
         self.val_mask = split_idx['valid']
         self.test_mask = split_idx['test']
+        print("Dataset loading completed successfully")
         
     def get_graph_data(self) -> Data:
         """
