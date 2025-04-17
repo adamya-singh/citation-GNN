@@ -14,61 +14,75 @@ This is a solo weekend project, so the focus is on creating a functional Minimum
 
 #### ✅ Completed Components:
 1. **Project Setup**
-   - Directory structure created
-   - Virtual environment set up
-   - Dependencies installed and documented
+   - Directory structure created (backend/frontend)
+   - Virtual environment set up (backend)
+   - Dependencies installed and documented (backend/frontend)
+   - Initial Git setup with `.gitignore`
 
-2. **Data Handling**
-   - ArxivDataset class implemented
+2. **Data Handling (Backend)**
+   - `ArxivDataset` class implemented using OGB
    - Dataset loading and processing
    - Basic data statistics and access methods
    - Test file for data loading
 
-3. **Model Development**
-   - GAT model implementation
-   - Attention weight tracking
-   - Link prediction functionality
-   - Test file for model functionality
+3. **Model Development (Backend - Implementation Only)**
+   - GAT model implementation (`models/gat.py`)
+   - Attention weight tracking capability
+   - Link prediction head (dot product)
+   - Test file for model structure and forward pass
+   - **Note:** Model training is not yet implemented.
 
 4. **Backend API**
-   - FastAPI application setup
+   - FastAPI application setup (`backend/app.py`)
+   - CORS middleware configured
    - Two endpoints implemented:
-     - `/predict_link` (POST): Predicts citation probability between papers
-     - `/graph` (GET): Returns graph subset for visualization
-   - Error handling and input validation
-   - Basic API test suite
+     - `POST /predict_link`: Predicts citation probability (placeholder, uses untrained model).
+     - `GET /graph`: Returns a sampled subgraph for visualization using a degree-based expansion strategy.
+   - Error handling and input validation.
+   - Basic API test suite (`backend/test_api.py`).
+   - Subgraph sampling logic debugged and fixed.
+
+5. **Frontend Setup**
+   - Vite + React + TypeScript project initialized.
+   - Basic project structure created (`frontend/src`).
+   - Dependencies installed (including ReactFlow, Shadcn UI, Axios).
+   - Basic components likely set up for visualization.
 
 #### 🚧 In Progress:
-1. **Model Training**
-   - Model architecture implemented
-   - Training code needs to be written
-   - Model weights need to be saved/loaded
+1. **Model Training (Backend)**
+   - Training loop implementation.
+   - Evaluation metrics definition.
+   - Saving/loading trained model weights.
 
 2. **Frontend Development**
-   - Not started yet
-   - Will use Next.js with graph visualization
-
-#### 📝 TODO:
-1. **Model Training**
-   - Implement training loop
-   - Add evaluation metrics
-   - Save/load model weights
-
-2. **Frontend Development**
-   - Set up Next.js project
-   - Implement graph visualization
-   - Create prediction form
-   - Add attention weight visualization
+   - Implementing graph visualization using ReactFlow.
+   - Fetching graph data from the `/graph` backend endpoint.
+   - Creating UI components (potentially using Shadcn UI).
+   - Adding interaction logic (e.g., prediction form, node inspection).
 
 3. **Integration**
-   - Connect frontend to backend
-   - Test full system flow
-   - Add error handling
+   - Testing the full frontend-backend data flow for graph visualization.
+   - Connecting prediction form (once built) to `/predict_link`.
 
-4. **Testing**
-   - Enhance API test suite
-   - Add model validation tests
-   - Add frontend tests
+#### 📝 TODO:
+1. **Complete Model Training**
+   - Train the GAT model on the Arxiv dataset.
+   - Evaluate model performance (AUC/AP).
+   - Integrate saved model weights into the backend API startup.
+
+2. **Complete Frontend Development**
+   - Finalize graph visualization layout and styling.
+   - Implement the prediction form/interface.
+   - Add attention weight visualization (if feasible).
+   - Improve UI/UX based on Shadcn components.
+
+3. **Testing**
+   - Enhance API test suite (e.g., test with trained model).
+   - Add model validation tests.
+   - Add basic frontend interaction tests.
+
+4. **Deployment (Optional)**
+   - Document deployment steps (e.g., using Docker).
 
 ### Tech Stack
 
@@ -76,17 +90,20 @@ This is a solo weekend project, so the focus is on creating a functional Minimum
   - **Framework**: FastAPI (Python)
   - **GNN Library**: PyTorch Geometric (PyG)
   - **Server**: Uvicorn (ASGI server for FastAPI)
-  - **Data Handling**: In-memory storage for the dataset and model
+  - **Data Handling**: OGB (`ogbn-arxiv`), In-memory storage
 - **Frontend**:
-  - **Framework**: Next.js (React)
-  - **Graph Visualization**: Cytoscape.js or Sigma.js
-  - **API Calls**: Fetch or Axios for interacting with the backend API
+  - **Framework/Tooling**: Vite + React + TypeScript
+  - **UI Components**: Shadcn UI
+  - **Graph Visualization**: ReactFlow
+  - **API Calls**: Axios
+  - **Package Manager**: npm / Bun (presence of `bun.lockb` noted)
 
 **Rationale**:
-- **FastAPI**: Lightweight, fast, and easy to set up for RESTful APIs.
-- **PyTorch Geometric**: Leading library for GNNs, integrates well with the dataset.
-- **Next.js**: Provides a robust React framework with server-side rendering and easy API integration.
-- **Cytoscape.js/Sigma.js**: Specialized for interactive graph visualization, with React wrappers available.
+- **FastAPI**: Lightweight, fast, modern Python API framework.
+- **PyTorch Geometric**: Leading library for GNNs, integrates well with OGB.
+- **Vite/React/TypeScript**: Modern, efficient frontend stack.
+- **ReactFlow**: Powerful library specifically for node-based UIs and graph visualizations in React.
+- **Shadcn UI**: Utility-first component library for building consistent UIs.
 
 ### Dataset: OGBN-Arxiv
 
@@ -95,104 +112,94 @@ The project uses the `ogbn-arxiv` dataset from the Open Graph Benchmark:
 - **Edges**: ~1.1 million directed citation links (i → j if paper i cites j)
 - **Node Features**: 128-dimensional embeddings from paper abstracts/titles
 - **Labels**: Subject areas (not used in this project)
-- **Timestamps**: Year of publication (used for temporal splitting)
+- **Timestamps**: Year of publication (potential future use for temporal splitting)
 
 **Data Handling**:
 - The dataset is loaded using PyTorch Geometric's built-in dataset loader.
-- Data is split based on publication year:
-  - **Training**: Citations between papers published before 2018
-  - **Testing**: Citations involving papers published in 2018 or later
-- For the MVP, node indices (0 to N-1) are used as identifiers. Paper titles can be added later if time permits.
+- Currently, the entire graph is used without temporal splitting for the MVP.
+- Node indices (0 to N-1) are used as identifiers.
 
 ### Model Architecture
 
 The project employs a GNN for link prediction:
 - **Model**: GAT (Graph Attention Network)
-  - **Layers**: 2-3 GAT layers with 8 attention heads each
-  - **Hidden Dimension**: 256
-  - **Link Prediction Head**: Dot product of node embeddings
-- **Training**:
-  - **Positive Samples**: Existing citation edges from the training set
-  - **Negative Samples**: Randomly sampled non-edges
-  - **Loss Function**: Binary cross-entropy
-  - **Evaluation Metrics**: AUC or Average Precision on the test set
+  - **Layers**: 2 GAT layers implemented (configurable)
+  - **Heads**: 8 attention heads per layer (configurable)
+  - **Hidden Dimension**: 256 (configurable)
+  - **Attention Tracking**: Implemented to return attention weights per layer.
+  - **Link Prediction Head**: Dot product of final node embeddings followed by sigmoid.
+- **Training (TODO)**:
+  - **Positive Samples**: Existing citation edges.
+  - **Negative Samples**: Randomly sampled non-edges (strategy can be refined).
+  - **Loss Function**: Binary cross-entropy.
+  - **Evaluation Metrics**: AUC or Average Precision.
 
 **Rationale**:
-- GAT provides attention mechanisms to learn citation importance
-- Attention weights offer interpretability for predictions
-- Efficient for large graphs like `ogbn-arxiv`
-- Naturally handles directed relationships
+- GAT provides attention mechanisms to learn citation importance.
+- Attention weights offer interpretability for predictions.
 
 ### API Endpoints
 
 The backend provides the following key API endpoints:
 - **`POST /predict_link`**:
   - **Input**: JSON with two node indices, e.g., `{"node1": 0, "node2": 1}`
-  - **Output**: Predicted citation probability and attention weights, e.g., `{"probability": 0.75, "attention": {"layer1": 0.8, "layer2": 0.7}}`
+  - **Output**: Predicted citation probability and mean attention weights per layer, e.g., `{"probability": 0.75, "attention": {"layer1": 0.8, "layer2": 0.7}}`
+  - **Current Status**: Functional but uses an *untrained* model.
 - **`GET /graph`**:
-  - **Output**: A subset of the citation graph (nodes and edges) for visualization
-  - Returns first 100 nodes and all their connections
-  - Includes node features and edge information
+  - **Input**: Optional query parameters `max_nodes` (default 30) and `max_edges_per_node` (default 3 - applied during edge selection).
+  - **Output**: A subset of the citation graph (nodes and edges) for visualization.
+  - **Sampling Logic**: Starts with the highest degree node and iteratively adds the highest-degree neighbors until `max_nodes` is reached. Edges *between* these selected nodes are then identified and returned, potentially limited by total degree.
+  - **Current Status**: Functional and debugged.
 
 **Implementation**:
-- The API is built using FastAPI, with the GNN model and dataset loaded into memory on startup.
+- API built using FastAPI, GNN model and dataset loaded into memory on startup.
 - Error handling for invalid inputs and server errors.
-- Basic test suite for API functionality.
+- Basic test suite available.
 
-### Frontend Components (Not Started)
+### Frontend Components (In Progress)
 
-The frontend will consist of two main components:
-1. **Static Graph Visualization**:
-   - Displays a fixed subset of the citation graph (e.g., 100 nodes and their edges).
-   - Uses Cytoscape.js or Sigma.js for rendering.
-   - Visualizes attention weights through edge thickness.
-2. **Prediction Form**:
-   - Provides input fields for two node indices.
-   - Includes a button to query the backend API and display the predicted citation probability.
-   - Shows attention weights for interpretability.
+The frontend aims to provide:
+1. **Interactive Graph Visualization**:
+   - Displays a subgraph fetched from the `/graph` endpoint.
+   - Uses ReactFlow for rendering nodes and edges.
+   - Styling potentially managed via Shadcn UI and Tailwind CSS.
+   - Goal: Allow users to explore a portion of the citation network.
+2. **Prediction Interface (TODO)**:
+   - Input fields for selecting two papers (by node index).
+   - Button to trigger a call to the `/predict_link` endpoint.
+   - Display area for the predicted probability and potentially attention information.
 
 **Interaction**:
-- The graph will be static for the MVP, with optional interactivity (e.g., clicking nodes to view details) if time allows.
-- The form will use API calls to fetch and display predictions.
+- Users can view the fetched subgraph.
+- Future interaction may include node dragging, zooming, panning (via ReactFlow).
+- The prediction interface will allow querying specific links.
 
 ### Development Phases
 
-The project is divided into the following phases:
-1. ✅ **Project Setup** (1 hour):
-   - Create directory structure, set up virtual environment, install initial dependencies.
-2. ✅ **Data Handling** (2 hours):
-   - Load and split the `ogbn-arxiv` dataset using PyTorch Geometric.
-3. ✅ **Model Development** (4-5 hours):
-   - Implement and train a GAT model for link prediction.
-   - Add attention weight tracking.
-4. ✅ **Backend API** (2-3 hours):
-   - Create the `/predict_link` endpoint in FastAPI.
-   - Add attention weight handling.
-5. 🚧 **Frontend Visualization** (3-4 hours):
-   - Build the Next.js app with graph visualization and prediction form.
-   - Add attention weight visualization.
-6. 🚧 **Integration and Testing** (2-3 hours):
-   - Connect the frontend to the backend and test the full flow.
-7. 📝 **Optional Enhancements** (if time permits):
-   - Add interactivity to the graph, display paper titles, or improve UI/UX.
-
-**Total Estimated Time**: 14-17 hours
+The project is progressing through these phases:
+1. ✅ **Project Setup** (Complete)
+2. ✅ **Data Handling (Backend)** (Complete)
+3. ✅ **Model Development (Backend - Implementation)** (Complete)
+4. ✅ **Backend API** (Complete, pending model training integration)
+5. 🚧 **Frontend Setup & Visualization** (In Progress)
+6. 🚧 **Integration and Testing** (In Progress - basic graph fetching)
+7. 📝 **Model Training** (TODO)
+8. 📝 **Complete Frontend Features** (TODO)
+9. 📝 **Final Testing & Refinement** (TODO)
+10. 📝 **Optional Enhancements** (if time permits)
 
 ### Open Design Choices
 
-The following design decisions are still open and can be refined with LLM assistance:
-1. **Model Architecture**:
-   - Fine-tune number of attention heads and layers.
-   - Consider multi-head attention aggregation strategies.
-2. **Negative Sampling Strategy**:
-   - Use random negatives for the MVP.
-   - Experiment with hard negatives (e.g., nodes with shared neighbors) for improved performance.
-3. **Storage and Querying**:
-   - Currently in-memory; consider SQLite if memory constraints arise.
-   - Defer advanced storage solutions (e.g., Neo4j) unless needed.
-4. **Frontend Design**:
-   - Start with a static graph; add interactivity if time allows.
-   - Optionally, integrate paper titles or other metadata for a richer experience.
+1. **Model Architecture/Training**:
+   - Fine-tune hyperparameters (layers, heads, dimensions).
+   - Refine negative sampling strategy.
+   - Decide on evaluation protocol.
+2. **Storage and Querying**:
+   - Currently in-memory; likely sufficient for MVP.
+3. **Frontend Design/Features**:
+   - Finalize graph layout and interactions (ReactFlow offers many options).
+   - Decide how/if to display attention weights.
+   - Integrate paper titles or other metadata if feasible.
 
 ### LLM Assistance
 
